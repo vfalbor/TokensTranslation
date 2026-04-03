@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- ── SEO ── -->
+  <title>TokenTranslation — Token-Efficient AI Middleware | tokenstree.eu</title>
+  <meta name="description" content="TokenTranslation reduces your LLM token usage by up to 55%. Translates prompts to the most efficient language and introduces Tokinensis — a cross-lingual constructed language that minimizes BPE token cost.">
+  <meta name="keywords" content="token optimization, LLM, AI cost reduction, token efficient, Claude, GPT-4, Tokinensis, AI middleware, translation API">
+  <meta name="author" content="TokensTree">
+  <link rel="canonical" href="https://tokenstree.eu/">
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://tokenstree.eu/">
+  <meta property="og:title" content="TokenTranslation — Save up to 55% on LLM tokens">
+  <meta property="og:description" content="Middleware that translates prompts to the cheapest language before sending to your LLM, then translates responses back. Integrate in 4 lines.">
+  <meta property="og:image" content="https://tokenstree.eu/og-image.png">
+  <meta property="og:site_name" content="TokenTranslation by TokensTree">
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="TokenTranslation — Save up to 55% on LLM tokens">
+  <meta name="twitter:description" content="Token-efficient AI middleware. Translates prompts to minimize BPE token cost. Introduces Tokinensis, a token-optimized constructed language.">
+  <meta name="twitter:image" content="https://tokenstree.eu/og-image.png">
+
+  <!-- JSON-LD Structured Data -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "TokenTranslation",
+    "url": "https://tokenstree.eu",
+    "description": "Token-efficient LLM middleware that reduces API costs by translating prompts to the most BPE-efficient language.",
+    "applicationCategory": "DeveloperApplication",
+    "operatingSystem": "Linux, Ubuntu 20.04",
+    "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+    "author": { "@type": "Organization", "name": "TokensTree", "url": "https://tokenstree.eu" }
+  }
+  </script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg:#f4f6fb;--bg2:#eaecf4;--surface:#fff;--surface2:#f0f2f8;
+      --border:#d8dce8;--accent:#2563eb;--accent-lt:#eff4ff;
+      --accent2:#7c3aed;--accent2-lt:#f5f3ff;
+      --green:#059669;--green-lt:#ecfdf5;--amber:#d97706;
+      --red:#dc2626;--red-lt:#fef2f2;
+      --text:#1e2130;--text2:#4a5168;--text3:#8b92a8;
+      --mono:'IBM Plex Mono',monospace;--sans:'DM Sans',sans-serif;
+      --shadow:0 1px 3px rgba(30,33,48,.08),0 4px 16px rgba(30,33,48,.06);
+      --shadow-lg:0 4px 24px rgba(30,33,48,.12);
+    }
+    *{margin:0;padding:0;box-sizing:border-box;}
+    body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:100vh;font-size:15px;line-height:1.6;}
+
+    nav{background:var(--surface);border-bottom:1px solid var(--border);padding:0 2.5rem;height:60px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;}
+    .logo{display:flex;align-items:center;gap:.5rem;}
+    .logo-icon{width:28px;height:28px;background:var(--accent);border-radius:7px;display:flex;align-items:center;justify-content:center;color:white;font-size:.8rem;font-weight:700;}
+    .logo-text{font-family:var(--mono);font-size:.9rem;font-weight:600;color:var(--text);}
+    .logo-text span{color:var(--accent);}
+    .nav-links{display:flex;gap:.25rem;align-items:center;}
+    .nav-link{padding:.4rem .85rem;border-radius:7px;font-size:.85rem;font-weight:500;color:var(--text2);text-decoration:none;transition:all .15s;}
+    .nav-link:hover{background:var(--surface2);color:var(--text);}
+    .nav-link.cta{background:var(--accent);color:white;margin-left:.5rem;}
+    .nav-link.cta:hover{background:#1d4ed8;}
+
+    .hero{max-width:1100px;margin:0 auto;padding:5rem 2.5rem 2rem;display:grid;grid-template-columns:1fr 420px;gap:4rem;align-items:start;}
+    @media(max-width:900px){.hero{grid-template-columns:1fr;padding:3rem 1.5rem 1.5rem;gap:2rem;}}
+    .eyebrow{display:inline-flex;align-items:center;gap:.5rem;background:var(--accent-lt);color:var(--accent);border:1px solid #bfdbfe;border-radius:100px;padding:.25rem .85rem;font-size:.78rem;font-weight:600;letter-spacing:.03em;margin-bottom:1.25rem;}
+    .eyebrow::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--accent);animation:blink 2s infinite;}
+    @keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
+    h1{font-size:clamp(2rem,4vw,3.2rem);font-weight:700;line-height:1.15;letter-spacing:-.02em;margin-bottom:1.25rem;}
+    h1 em{font-style:normal;color:var(--accent);}
+    .hero-sub{color:var(--text2);font-size:1.05rem;max-width:500px;margin-bottom:2rem;line-height:1.75;}
+    .hero-stats{display:flex;gap:2rem;flex-wrap:wrap;margin-bottom:1.5rem;}
+    .hstat{display:flex;flex-direction:column;}
+    .hstat-val{font-family:var(--mono);font-size:1.6rem;font-weight:600;color:var(--text);}
+    .hstat-label{font-size:.75rem;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;}
+
+    .auth-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:2rem;box-shadow:var(--shadow-lg);}
+    .auth-card-title{font-size:1rem;font-weight:600;margin-bottom:1.25rem;}
+    .tabs{display:flex;background:var(--surface2);border-radius:8px;padding:3px;margin-bottom:1.25rem;gap:3px;}
+    .tab{flex:1;padding:.45rem;border:none;border-radius:6px;font-family:var(--sans);font-size:.85rem;font-weight:500;color:var(--text3);background:transparent;cursor:pointer;transition:all .15s;}
+    .tab.active{background:var(--surface);color:var(--text);box-shadow:0 1px 3px rgba(30,33,48,.1);}
+    .tab-content{display:none;}
+    .tab-content.active{display:block;}
+
+    /* Google OAuth button */
+    .google-btn{width:100%;display:flex;align-items:center;justify-content:center;gap:.75rem;padding:.7rem 1rem;background:white;border:1.5px solid var(--border);border-radius:8px;font-family:var(--sans);font-size:.88rem;font-weight:500;color:var(--text);cursor:pointer;text-decoration:none;transition:all .15s;margin-bottom:1rem;}
+    .google-btn:hover{border-color:#bfdbfe;background:#fafbff;box-shadow:var(--shadow);}
+    .google-btn svg{flex-shrink:0;}
+    .divider{display:flex;align-items:center;gap:.75rem;margin-bottom:1rem;}
+    .divider span{font-size:.75rem;color:var(--text3);white-space:nowrap;}
+    .divider::before,.divider::after{content:'';flex:1;height:1px;background:var(--border);}
+
+    label{display:block;font-size:.8rem;font-weight:500;color:var(--text2);margin-bottom:.35rem;margin-top:1rem;}
+    label:first-of-type{margin-top:0;}
+    input[type=text],input[type=email],input[type=password]{width:100%;background:var(--surface);border:1.5px solid var(--border);border-radius:8px;padding:.65rem .9rem;color:var(--text);font-family:var(--sans);font-size:.9rem;outline:none;transition:border-color .15s,box-shadow .15s;}
+    input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(37,99,235,.1);}
+    .btn{width:100%;margin-top:1.25rem;padding:.75rem;background:var(--accent);color:white;border:none;border-radius:8px;font-family:var(--sans);font-size:.9rem;font-weight:600;cursor:pointer;transition:background .15s,transform .1s;box-shadow:0 1px 3px rgba(37,99,235,.3);}
+    .btn:hover{background:#1d4ed8;transform:translateY(-1px);}
+    .btn:disabled{opacity:.55;pointer-events:none;}
+    .msg{margin-top:.75rem;padding:.6rem .85rem;border-radius:7px;font-size:.82rem;}
+    .msg.error{background:var(--red-lt);color:var(--red);border:1px solid #fecaca;}
+    .msg.success{background:var(--green-lt);color:var(--green);border:1px solid #a7f3d0;}
+    .msg.info{background:var(--accent-lt);color:var(--accent);border:1px solid #bfdbfe;}
+    .api-key-box{margin-top:1rem;background:var(--accent-lt);border:1px solid #bfdbfe;border-radius:8px;padding:1rem;}
+    .api-key-label{font-size:.72rem;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--accent);margin-bottom:.4rem;}
+    .api-key-val{font-family:var(--mono);font-size:.8rem;color:var(--text);word-break:break-all;cursor:pointer;}
+    .api-key-val:hover{color:var(--accent);}
+    .api-key-hint{font-size:.72rem;color:var(--text3);margin-top:.35rem;}
+
+    .container{max-width:1100px;margin:0 auto;padding:0 2.5rem 5rem;}
+    @media(max-width:768px){.container{padding:0 1.5rem 3rem;}}
+    .sec-header{display:flex;align-items:center;gap:1rem;margin:3.5rem 0 1.5rem;}
+    .sec-title{font-size:.7rem;font-weight:600;text-transform:uppercase;letter-spacing:.12em;color:var(--text3);white-space:nowrap;}
+    .sec-line{flex:1;height:1px;background:var(--border);}
+
+    .skill-panel{background:var(--surface);border:1px solid var(--border);border-radius:14px;overflow:hidden;box-shadow:var(--shadow);}
+    .skill-panel-header{background:linear-gradient(135deg,#1e40af 0%,#7c3aed 100%);padding:1.75rem 2rem;color:white;}
+    .skill-panel-header h2{font-size:1.2rem;font-weight:700;margin-bottom:.4rem;}
+    .skill-panel-header p{opacity:.85;font-size:.88rem;}
+    .skill-steps{display:grid;grid-template-columns:1fr 1fr;}
+    @media(max-width:760px){.skill-steps{grid-template-columns:1fr;}}
+    .skill-step{padding:1.5rem 2rem;border-right:1px solid var(--border);border-bottom:1px solid var(--border);}
+    .skill-step:nth-child(2n){border-right:none;}
+    .skill-step:nth-last-child(-n+2){border-bottom:none;}
+    .step-num{width:28px;height:28px;background:var(--accent-lt);color:var(--accent);border-radius:8px;font-size:.8rem;font-weight:700;font-family:var(--mono);display:flex;align-items:center;justify-content:center;margin-bottom:.85rem;}
+    .step-title{font-size:.9rem;font-weight:600;margin-bottom:.4rem;}
+    .step-desc{font-size:.83rem;color:var(--text2);line-height:1.65;}
+
+    .inject-box{margin:1.5rem 2rem;background:#f8f9ff;border:1.5px solid #c7d2fe;border-radius:10px;overflow:hidden;}
+    .inject-header{padding:.65rem 1rem;background:#eef2ff;border-bottom:1px solid #c7d2fe;display:flex;justify-content:space-between;align-items:center;}
+    .inject-label{font-size:.75rem;font-weight:600;color:var(--accent2);text-transform:uppercase;letter-spacing:.08em;}
+    .copy-btn-sm{font-size:.75rem;font-weight:500;color:var(--accent);background:none;border:none;cursor:pointer;padding:.2rem .5rem;border-radius:4px;transition:background .15s;}
+    .copy-btn-sm:hover{background:#dbeafe;}
+    .inject-content{padding:1.25rem;font-family:var(--mono);font-size:.79rem;line-height:1.9;color:var(--text);white-space:pre-wrap;}
+    .ph{background:#fef9c3;border-radius:3px;padding:0 4px;color:#92400e;}
+
+    .formats-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.25rem;padding:0 2rem 2rem;}
+    @media(max-width:760px){.formats-grid{grid-template-columns:1fr;}}
+    .format-card{background:var(--surface2);border:1.5px solid var(--border);border-radius:10px;overflow:hidden;transition:border-color .15s;}
+    .format-card:hover{border-color:var(--accent);}
+    .format-card-header{padding:.85rem 1rem;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:.6rem;}
+    .format-icon{width:30px;height:30px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:.9rem;}
+    .format-card-title{font-size:.88rem;font-weight:600;}
+    .format-card-sub{font-size:.73rem;color:var(--text3);}
+    .format-card-body{padding:1rem;font-size:.82rem;color:var(--text2);line-height:1.75;}
+    .ftag{display:inline-block;background:var(--surface);border:1px solid var(--border);border-radius:5px;padding:.12rem .4rem;font-family:var(--mono);font-size:.72rem;color:var(--text2);margin:.1rem;}
+
+    .code-block{background:#1e2130;border-radius:10px;overflow:hidden;}
+    .code-block-header{padding:.6rem 1rem;background:#2a2d3e;display:flex;justify-content:space-between;align-items:center;}
+    .code-lang{font-family:var(--mono);font-size:.72rem;color:#7882a0;}
+    .code-copy{font-size:.72rem;color:#7882a0;background:none;border:none;cursor:pointer;transition:color .15s;}
+    .code-copy:hover{color:#a5b4fc;}
+    .code-block pre{padding:1.25rem;font-family:var(--mono);font-size:.79rem;line-height:1.8;color:#c8d0e8;overflow-x:auto;}
+    .cd{color:#5c6080;}.kw{color:#818cf8;}.st{color:#86efac;}.fn{color:#67e8f9;}.vr{color:#fcd34d;}
+
+    .lang-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:.75rem;}
+    .lang-card{background:var(--surface);border:1.5px solid var(--border);border-radius:10px;padding:1rem 1.1rem;transition:border-color .15s,transform .15s;}
+    .lang-card:hover{border-color:var(--accent);transform:translateY(-2px);box-shadow:var(--shadow);}
+    .lang-card.best{border-color:#a7f3d0;background:var(--green-lt);}
+    .lang-card.worst{border-color:#fecaca;background:var(--red-lt);}
+    .lang-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:.55rem;}
+    .lang-name{font-size:.88rem;font-weight:600;}
+    .lang-mult{font-family:var(--mono);font-size:.8rem;font-weight:600;}
+    .lang-mult.good{color:var(--green);}.lang-mult.ok{color:var(--amber);}.lang-mult.bad{color:var(--red);}
+    .lang-bar-wrap{background:var(--bg2);border-radius:4px;height:5px;overflow:hidden;}
+    .lang-bar{height:100%;border-radius:4px;}
+    .lang-eff{font-size:.72rem;color:var(--text3);margin-top:.4rem;}
+
+    .dash-cta{background:linear-gradient(135deg,#1e40af,#7c3aed);border-radius:14px;padding:2.5rem;color:white;display:flex;justify-content:space-between;align-items:center;gap:2rem;flex-wrap:wrap;box-shadow:var(--shadow-lg);}
+    .dash-cta h3{font-size:1.15rem;font-weight:700;margin-bottom:.4rem;}
+    .dash-cta p{opacity:.85;font-size:.87rem;}
+    .dash-cta-btn{padding:.8rem 2rem;background:white;color:#1e40af;border-radius:8px;font-weight:700;font-size:.9rem;text-decoration:none;white-space:nowrap;transition:transform .15s;box-shadow:0 2px 8px rgba(0,0,0,.15);}
+    .dash-cta-btn:hover{transform:translateY(-2px);}
+
+    @keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+    .fade-up{animation:fadeUp .5s ease both;}
+  </style>
+</head>
+<body>
+
+<nav>
+  <div class="logo">
+    <div class="logo-icon">⚡</div>
+    <div class="logo-text">Token<span>Translation</span></div>
+  </div>
+  <div class="nav-links">
+    <a href="#skill-guide" class="nav-link">Skill Guide</a>
+    <a href="#languages" class="nav-link">Languages</a>
+    <a href="dashboard.html" class="nav-link cta">Dashboard →</a>
+  </div>
+</nav>
+
+<section class="hero">
+  <div class="fade-up">
+    <div class="eyebrow">Token-Efficient LLM Middleware · tokenstree.eu</div>
+    <h1>Send <em>fewer tokens.</em><br>Pay less. Think more.</h1>
+    <p class="hero-sub">TokenTranslation sits between your agents and your LLM — it translates every prompt to the most token-efficient language, then translates responses back. Now with <strong>Tokinensis v2</strong>: a cross-lingual constructed language for maximum BPE efficiency.</p>
+    <div class="hero-stats">
+      <div class="hstat"><div class="hstat-val" id="global-saved">—</div><div class="hstat-label">Tokens Saved</div></div>
+      <div class="hstat"><div class="hstat-val" id="global-requests">—</div><div class="hstat-label">Requests</div></div>
+      <div class="hstat"><div class="hstat-val" id="global-users">—</div><div class="hstat-label">Users</div></div>
+    </div>
+  </div>
+
+  <!-- AUTH CARD -->
+  <div class="auth-card fade-up" style="animation-delay:.1s">
+    <div class="auth-card-title">Get your API key</div>
+    <div class="tabs">
+      <button class="tab active" onclick="showTab('register')">Register</button>
+      <button class="tab" onclick="showTab('login')">Login</button>
+    </div>
+
+    <!-- REGISTER -->
+    <div class="tab-content active" id="tab-register">
+      <!-- Google OAuth -->
+      <a href="/translation/auth/google" class="google-btn">
+        <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.35-8.16 2.35-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
+        Continue with Google
+      </a>
+      <div class="divider"><span>or register with email</span></div>
+      <label for="reg-username">Username</label>
+      <input type="text" id="reg-username" placeholder="agent_builder" autocomplete="off">
+      <label for="reg-email">Email</label>
+      <input type="email" id="reg-email" placeholder="you@example.com" autocomplete="off">
+      <label for="reg-password">Password</label>
+      <input type="password" id="reg-password" placeholder="Min. 8 characters" autocomplete="new-password">
+      <button class="btn" id="reg-btn" onclick="register()">Create Account &amp; Get API Key</button>
+      <div id="reg-msg"></div>
+      <div id="reg-key" style="display:none"></div>
+    </div>
+
+    <!-- LOGIN -->
+    <div class="tab-content" id="tab-login">
+      <a href="/translation/auth/google" class="google-btn">
+        <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.35-8.16 2.35-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
+        Continue with Google
+      </a>
+      <div class="divider"><span>or login with email</span></div>
+      <label for="login-email">Email</label>
+      <input type="email" id="login-email" placeholder="you@example.com">
+      <label for="login-password">Password</label>
+      <input type="password" id="login-password" placeholder="••••••••">
+      <button class="btn" id="login-btn" onclick="login()">Login</button>
+      <div id="login-msg"></div>
+      <div id="login-key" style="display:none"></div>
+    </div>
+  </div>
+</section>
+
+<div class="container">
+
+  <!-- SKILL GUIDE -->
+  <div class="sec-header" id="skill-guide">
+    <div class="sec-title">Skill Integration Guide</div>
+    <div class="sec-line"></div>
+  </div>
+
+  <div class="skill-panel fade-up">
+    <div class="skill-panel-header">
+      <h2>⚡ Connect TokenTranslation to your agent — no programming required</h2>
+      <p>Copy one block of text into your skill's system prompt. Works with Claude Desktop, MCP, CrewAI, AutoGPT, LangChain, and any agent framework.</p>
+    </div>
+
+    <div class="skill-steps">
+      <div class="skill-step">
+        <div class="step-num">01</div>
+        <div class="step-title">Register &amp; get your API key</div>
+        <div class="step-desc">Use Google or create an account with email. You'll receive a key like <code style="font-family:var(--mono);font-size:.78rem;background:var(--surface2);padding:1px 5px;border-radius:4px">tk_xxxx…</code> — copy it.</div>
+      </div>
+      <div class="skill-step">
+        <div class="step-num">02</div>
+        <div class="step-title">Copy the instruction block below</div>
+        <div class="step-desc">Replace the two highlighted values with your server URL and API key. No coding required.</div>
+      </div>
+      <div class="skill-step">
+        <div class="step-num">03</div>
+        <div class="step-title">Paste into your skill system prompt</div>
+        <div class="step-desc">The agent reads the instructions and handles all translation calls automatically before and after each LLM request.</div>
+      </div>
+      <div class="skill-step">
+        <div class="step-num">04</div>
+        <div class="step-title">Watch savings accumulate in real time</div>
+        <div class="step-desc">Open the Dashboard to see tokens saved by language, total cost reduction, and live Tokinensis v1/v2 demos.</div>
+      </div>
+    </div>
+
+    <div class="inject-box">
+      <div class="inject-header">
+        <div class="inject-label">📋 Paste into your skill / system prompt</div>
+        <button class="copy-btn-sm" id="inject-btn" onclick="copyInject()">Copy block</button>
+      </div>
+      <div class="inject-content" id="inject-text">You have access to a token optimization service called TokenTranslation.
+
+BEFORE processing any user message, POST to:
+  <span class="ph">https://tokenstree.eu</span>/translate/in
+  Header: X-API-Key: <span class="ph">tk_your_api_key_here</span>
+  Body: {"text": "&lt;user message&gt;", "use_tokinensis": false}
+Use the "optimized_text" as your actual input. Store "source_lang".
+
+AFTER generating your response, POST to:
+  <span class="ph">https://tokenstree.eu</span>/translate/out
+  Header: X-API-Key: <span class="ph">tk_your_api_key_here</span>
+  Body: {"text": "&lt;your response&gt;", "target_lang": "&lt;stored source_lang&gt;"}
+Return the "text" field to the user.</div>
+    </div>
+
+    <div style="padding:0 2rem .75rem"><div style="font-size:.8rem;font-weight:600;color:var(--text2);margin-bottom:.85rem">Choose your translation backend:</div></div>
+    <div class="formats-grid">
+      <div class="format-card">
+        <div class="format-card-header">
+          <div class="format-icon" style="background:var(--green-lt)">🖥</div>
+          <div><div class="format-card-title">Format 1 — Local (VPS)</div><div class="format-card-sub">argostranslate · Private · No API cost</div></div>
+        </div>
+        <div class="format-card-body">
+          Runs entirely on your VPS. ~300 MB RAM per language pair.<br><br>
+          Set <span class="ftag">TRANSLATION_BACKEND=local</span> in <span class="ftag">.env</span>, then:<br>
+          <code style="font-family:var(--mono);font-size:.78rem;background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:.4rem .7rem;display:block;margin-top:.5rem">python install_models.py</code>
+          <br>✅ Zero external calls · ✅ No cost · ⚡ 50–200 tok/s
+        </div>
+      </div>
+      <div class="format-card">
+        <div class="format-card-header">
+          <div class="format-icon" style="background:var(--accent-lt)">☁</div>
+          <div><div class="format-card-title">Format 2 — Google Translate</div><div class="format-card-sub">deep-translator · 100+ languages · Zero setup</div></div>
+        </div>
+        <div class="format-card-body">
+          Works immediately, no model installation needed.<br><br>
+          Set <span class="ftag">TRANSLATION_BACKEND=google</span> in <span class="ftag">.env</span>. Optionally add <span class="ftag">GOOGLE_TRANSLATE_API_KEY</span> for the official API.<br><br>
+          ✅ 100+ languages · ✅ No download · ⚡ 200–500ms
+        </div>
+      </div>
+    </div>
+
+    <div style="padding:0 2rem 2rem">
+      <details>
+        <summary style="cursor:pointer;font-size:.83rem;font-weight:600;color:var(--text2);padding:.5rem 0;list-style:none;display:flex;align-items:center;gap:.5rem">
+          <span style="color:var(--accent)">▶</span> Python client — 4 lines of code
+        </summary>
+        <div style="margin-top:.75rem">
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">python</span>
+              <button class="code-copy" id="code-btn" onclick="copyCode()">Copy</button>
+            </div>
+            <pre id="code-pre"><span class="cd"># 1. Copy skill_client.py into your project</span>
+<span class="kw">from</span> skill_client <span class="kw">import</span> <span class="fn">TokenTranslationClient</span>
+tt = <span class="fn">TokenTranslationClient</span>(<span class="st">"https://tokenstree.eu"</span>, api_key=<span class="st">"tk_your_key"</span>)
+<span class="vr">optimized</span>, <span class="vr">meta</span> = <span class="kw">await</span> tt.<span class="fn">translate_in</span>(user_prompt)
+<span class="vr">final</span> = <span class="kw">await</span> tt.<span class="fn">translate_out</span>(llm_response, meta[<span class="st">"source_lang"</span>])</pre>
+          </div>
+        </div>
+      </details>
+    </div>
+  </div>
+
+  <!-- LANGUAGE TABLE -->
+  <div class="sec-header" id="languages">
+    <div class="sec-title">Token cost by language (tiktoken cl100k_base BPE)</div>
+    <div class="sec-line"></div>
+  </div>
+  <p style="font-size:.85rem;color:var(--text2);margin-bottom:1.25rem">Lower multiplier = fewer tokens = lower LLM cost. English baseline = 1.00×. ⚡ Tokinensis v2 achieves 0.65× via cross-lingual root compression.</p>
+  <div class="lang-grid" id="langGrid">
+    <div style="color:var(--text3);font-size:.85rem;padding:1rem;grid-column:1/-1">Loading…</div>
+  </div>
+
+  <!-- DASHBOARD CTA -->
+  <div class="sec-header" style="margin-top:3.5rem">
+    <div class="sec-title">Dashboard</div>
+    <div class="sec-line"></div>
+  </div>
+  <div class="dash-cta">
+    <div>
+      <h3>Token savings, Tokinensis v1 &amp; v2 demo, live translator</h3>
+      <p>Real-time stats · per-language breakdown · interactive v1/v2 encoder · optimal token mapper</p>
+    </div>
+    <a href="dashboard.html" class="dash-cta-btn">Open Dashboard →</a>
+  </div>
+
+</div>
+
+<script>
+const API='/translation';
+
+// Check for OAuth callback params
+const urlP=new URLSearchParams(window.location.search);
+if(urlP.get('token')){
+  localStorage.setItem('tt_jwt',urlP.get('token'));
+  localStorage.setItem('tt_api_key',urlP.get('key')||'');
+  window.history.replaceState({},'','/');
+  window.location='dashboard.html';
+}
+
+fetch(`${API}/stats/global`).then(r=>r.json()).then(d=>{
+  q('global-saved').textContent=fmt(d.total_tokens_saved);
+  q('global-requests').textContent=fmt(d.total_requests);
+  q('global-users').textContent=fmt(d.total_users);
+}).catch(()=>{});
+
+fetch(`${API}/translate/languages`).then(r=>r.json()).then(data=>{
+  const grid=q('langGrid'); grid.innerHTML='';
+  const sorted=[...data.ranked_by_efficiency];
+  // Add Tokinensis v2 at front with updated multiplier
+  sorted.unshift({code:'tok2',name:'Tokinensis v2',flag:'⚡',multiplier:0.65,efficiency:'Maximum — cross-lingual constructed language'});
+  sorted.unshift({code:'tok1',name:'Tokinensis v1',flag:'⚡',multiplier:0.72,efficiency:'High — abbreviation + symbol compression'});
+  sorted.forEach((lang,i)=>{
+    const m=lang.multiplier;
+    const cls=m<=1?'good':m<=1.3?'ok':'bad';
+    const bar=m<=1?'#059669':m<=1.3?'#d97706':'#dc2626';
+    const cc=(lang.code==='tok1'||lang.code==='tok2'||lang.code==='en'||lang.code==='zh')?'best':m>=1.8?'worst':'';
+    const el=document.createElement('div');
+    el.className=`lang-card ${cc}`;
+    el.style.cssText=`animation:fadeUp .4s ease both;animation-delay:${i*.03}s`;
+    el.innerHTML=`<div class="lang-top"><div class="lang-name">${lang.flag} ${lang.name}</div><div class="lang-mult ${cls}">${m}×</div></div><div class="lang-bar-wrap"><div class="lang-bar" style="width:${Math.min(100,m*50)}%;background:${bar}"></div></div><div class="lang-eff">${lang.efficiency}</div>`;
+    grid.appendChild(el);
+  });
+}).catch(()=>q('langGrid').innerHTML='<div style="color:var(--text3);font-size:.85rem;padding:1rem;grid-column:1/-1">Start the backend to see data.</div>');
+
+function showTab(n){
+  ['register','login'].forEach(t=>q(`tab-${t}`).classList.toggle('active',t===n));
+  document.querySelectorAll('.tab').forEach((el,i)=>el.classList.toggle('active',(i===0&&n==='register')||(i===1&&n==='login')));
+}
+function setMsg(id,txt,type){const el=q(id);el.className=`msg ${type}`;el.textContent=txt;}
+function showKey(cid,k){
+  const c=q(cid);c.style.display='block';
+  c.innerHTML=`<div class="api-key-box"><div class="api-key-label">Your API Key</div><div class="api-key-val" onclick="cpTxt(this)" title="Click to copy">${k}</div><div class="api-key-hint">Click to copy · Keep it private</div></div>`;
+  localStorage.setItem('tt_api_key',k);
+}
+async function register(){
+  const btn=q('reg-btn');btn.disabled=true;btn.textContent='Creating account…';
+  const body={username:q('reg-username').value.trim(),email:q('reg-email').value.trim(),password:q('reg-password').value};
+  if(!body.username||!body.email||!body.password){setMsg('reg-msg','All fields are required.','error');btn.disabled=false;btn.textContent='Create Account & Get API Key';return;}
+  if(body.password.length<8){setMsg('reg-msg','Password must be at least 8 characters.','error');btn.disabled=false;btn.textContent='Create Account & Get API Key';return;}
+  try{
+    const r=await fetch(`${API}/auth/register`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+    const d=await r.json();
+    if(!r.ok)throw new Error(Array.isArray(d.detail)?d.detail.map(e=>e.msg||e).join(', '):(d.detail||'Registration failed'));
+    if(!d.user.email_verified){
+      setMsg('reg-msg','✓ Account created! Check your email to verify your address.','info');
+    }else{
+      setMsg('reg-msg',`✓ Welcome, ${d.user.username}!`,'success');
+    }
+    showKey('reg-key',d.api_key);
+    localStorage.setItem('tt_jwt',d.access_token);
+  }catch(e){setMsg('reg-msg',e.message,'error');}
+  finally{btn.disabled=false;btn.textContent='Create Account & Get API Key';}
+}
+async function login(){
+  const btn=q('login-btn');btn.disabled=true;btn.textContent='Logging in…';
+  const body={email:q('login-email').value.trim(),password:q('login-password').value};
+  try{
+    const r=await fetch(`${API}/auth/login`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+    const d=await r.json();
+    if(!r.ok)throw new Error(d.detail||'Login failed');
+    setMsg('login-msg',`✓ Welcome back, ${d.user.username}!`,'success');
+    showKey('login-key',d.api_key);
+    localStorage.setItem('tt_jwt',d.access_token);
+    localStorage.setItem('tt_api_key',d.api_key);
+  }catch(e){setMsg('login-msg',e.message,'error');}
+  finally{btn.disabled=false;btn.textContent='Login';}
+}
+function cpTxt(el){navigator.clipboard.writeText(el.textContent.trim());el.style.color='var(--accent)';setTimeout(()=>el.style.color='',1000);}
+function copyInject(){const txt=q('inject-text').innerText;navigator.clipboard.writeText(txt);const b=q('inject-btn');b.textContent='✓ Copied!';setTimeout(()=>b.textContent='Copy block',2000);}
+function copyCode(){navigator.clipboard.writeText(q('code-pre').innerText);const b=q('code-btn');b.textContent='✓ Copied!';setTimeout(()=>b.textContent='Copy',2000);}
+function q(id){return document.getElementById(id);}
+function fmt(n){if(!n)return'0';if(n>=1e6)return(n/1e6).toFixed(1)+'M';if(n>=1e3)return(n/1e3).toFixed(1)+'K';return String(Math.round(n));}
+</script>
+</body>
+</html>

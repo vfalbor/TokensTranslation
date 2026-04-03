@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /
+Disallow: /auth/
+Disallow: /stats/
+
+Sitemap: https://tokenstree.eu/sitemap.xml

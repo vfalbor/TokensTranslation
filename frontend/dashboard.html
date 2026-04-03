@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard — TokenTranslation | tokenstree.eu</title>
+  <meta name="robots" content="noindex">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root{--bg:#f4f6fb;--bg2:#eaecf4;--surface:#fff;--surface2:#f0f2f8;--border:#d8dce8;--accent:#2563eb;--accent-lt:#eff4ff;--accent2:#7c3aed;--accent2-lt:#f5f3ff;--green:#059669;--green-lt:#ecfdf5;--amber:#d97706;--amber-lt:#fffbeb;--red:#dc2626;--red-lt:#fef2f2;--text:#1e2130;--text2:#4a5168;--text3:#8b92a8;--mono:'IBM Plex Mono',monospace;--sans:'DM Sans',sans-serif;--shadow:0 1px 3px rgba(30,33,48,.08),0 4px 16px rgba(30,33,48,.06);--shadow-lg:0 4px 24px rgba(30,33,48,.12);}
+    *{margin:0;padding:0;box-sizing:border-box;}
+    body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:100vh;font-size:15px;}
+    .layout{display:flex;min-height:100vh;}
+    .sidebar{width:220px;flex-shrink:0;background:var(--surface);border-right:1px solid var(--border);padding:1.5rem 1rem;position:fixed;top:0;left:0;bottom:0;overflow-y:auto;display:flex;flex-direction:column;}
+    .logo{display:flex;align-items:center;gap:.5rem;margin-bottom:2rem;padding:0 .5rem;}
+    .logo-icon{width:26px;height:26px;background:var(--accent);border-radius:6px;display:flex;align-items:center;justify-content:center;color:white;font-size:.75rem;font-weight:700;}
+    .logo-text{font-family:var(--mono);font-size:.85rem;font-weight:600;color:var(--text);}
+    .logo-text span{color:var(--accent);}
+    .nav-item{display:flex;align-items:center;gap:.7rem;padding:.55rem .75rem;border-radius:8px;font-size:.85rem;font-weight:500;color:var(--text2);cursor:pointer;transition:all .15s;margin-bottom:.15rem;}
+    .nav-item:hover{background:var(--surface2);color:var(--text);}
+    .nav-item.active{background:var(--accent-lt);color:var(--accent);}
+    .nav-item .ic{font-size:.95rem;width:18px;text-align:center;}
+    .sidebar-spacer{flex:1;}
+    .sidebar-user{background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:.85rem 1rem;}
+    .sidebar-user-name{font-size:.85rem;font-weight:600;}
+    .sidebar-user-email{font-size:.72rem;color:var(--text3);margin-top:.15rem;}
+    .main{margin-left:220px;padding:2rem;flex:1;min-height:100vh;}
+    .page-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:2rem;}
+    .page-title{font-size:1.4rem;font-weight:700;}
+    .badge{font-family:var(--mono);font-size:.75rem;padding:.35rem .8rem;border-radius:100px;border:1px solid var(--border);color:var(--text3);}
+    .badge.google{border-color:#c7d2fe;color:var(--accent2);background:var(--accent2-lt);}
+    .badge.local{border-color:#a7f3d0;color:var(--green);background:var(--green-lt);}
+    .cards-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin-bottom:2rem;}
+    @media(max-width:1100px){.cards-grid{grid-template-columns:repeat(2,1fr);}}
+    .card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:1.25rem;box-shadow:var(--shadow);}
+    .card-label{font-size:.72rem;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.09em;margin-bottom:.5rem;}
+    .card-value{font-family:var(--mono);font-size:1.9rem;font-weight:600;color:var(--accent);}
+    .card-sub{font-size:.75rem;color:var(--text3);margin-top:.25rem;}
+    .card.purple .card-value{color:var(--accent2);} .card.amber .card-value{color:var(--amber);} .card.green .card-value{color:var(--green);}
+    .sec-head{display:flex;align-items:center;gap:1rem;margin:2rem 0 1rem;}
+    .sec-title{font-size:.7rem;font-weight:600;text-transform:uppercase;letter-spacing:.12em;color:var(--text3);white-space:nowrap;}
+    .sec-line{flex:1;height:1px;background:var(--border);}
+    .panel{background:var(--surface);border:1px solid var(--border);border-radius:12px;box-shadow:var(--shadow);}
+    .empty{padding:2.5rem;text-align:center;color:var(--text3);font-size:.9rem;}
+
+    /* ── VERSION TOGGLE ─────────────────────────────── */
+    .ver-toggle{display:flex;gap:0;margin-bottom:1.5rem;border:1.5px solid var(--border);border-radius:10px;overflow:hidden;}
+    .ver-btn{flex:1;padding:.75rem 1.25rem;border:none;background:transparent;font-family:var(--sans);font-size:.88rem;font-weight:500;color:var(--text2);cursor:pointer;transition:all .15s;display:flex;flex-direction:column;align-items:center;gap:.2rem;}
+    .ver-btn:first-child{border-right:1.5px solid var(--border);}
+    .ver-btn.active{background:linear-gradient(135deg,#1e40af,#7c3aed);color:white;}
+    .ver-btn .ver-tag{font-family:var(--mono);font-size:.7rem;opacity:.75;}
+    .ver-btn.active .ver-tag{opacity:.9;}
+
+    /* ── TOKINENSIS ENCODER ─────────────────────────── */
+    .tok-demo{padding:1.5rem;}
+    .tok-input-row{display:flex;gap:.75rem;margin-bottom:1rem;}
+    textarea.tok-input{flex:1;background:var(--surface2);border:1.5px solid var(--border);border-radius:8px;padding:.75rem 1rem;color:var(--text);font-family:var(--mono);font-size:.83rem;resize:vertical;min-height:90px;outline:none;transition:border-color .15s;}
+    textarea.tok-input:focus{border-color:var(--accent);}
+    .tok-btn{padding:.75rem 1.25rem;background:var(--accent);color:white;border:none;border-radius:8px;font-family:var(--sans);font-weight:600;font-size:.85rem;cursor:pointer;align-self:flex-end;white-space:nowrap;transition:background .15s;}
+    .tok-btn:hover{background:#1d4ed8;}
+    .tok-cmp{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem;}
+    @media(max-width:900px){.tok-cmp{grid-template-columns:1fr;}}
+    .tok-box{background:var(--surface2);border:1.5px solid var(--border);border-radius:8px;padding:1rem;}
+    .tok-box.opt{border-color:#a7f3d0;background:var(--green-lt);}
+    .tok-box-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:.5rem;}
+    .tok-box-label{font-size:.72rem;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--text3);}
+    .tok-count{font-family:var(--mono);font-size:.78rem;font-weight:600;color:var(--amber);}
+    .tok-count.opt{color:var(--green);}
+    .tok-text{font-family:var(--mono);font-size:.82rem;line-height:1.75;word-break:break-word;}
+    .savings-bar-wrap{background:var(--bg2);border-radius:6px;height:8px;overflow:hidden;margin-bottom:.75rem;}
+    .savings-bar{height:100%;background:linear-gradient(90deg,var(--accent),var(--green));border-radius:6px;transition:width 1s cubic-bezier(.22,1,.36,1);}
+    .savings-row{display:flex;gap:2rem;flex-wrap:wrap;}
+    .sitem{font-family:var(--mono);font-size:.8rem;color:var(--text2);}
+    .sitem strong{color:var(--green);}
+    .glossary-wrap{margin-top:.75rem;background:var(--accent2-lt);border:1px solid #c4b5fd;border-radius:8px;padding:.75rem 1rem;}
+    .glossary-title{font-size:.72rem;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--accent2);margin-bottom:.4rem;}
+    .glossary-items{font-family:var(--mono);font-size:.76rem;color:var(--text2);line-height:1.8;}
+
+    /* ── OPTIMAL TOKEN MAPPER ──────────────────────── */
+    .mapper-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:.6rem;margin:1rem 1.5rem 1.5rem;}
+    .mapper-field label{font-size:.72rem;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.07em;display:block;margin-bottom:.25rem;}
+    .mapper-field input{width:100%;background:var(--surface2);border:1.5px solid var(--border);border-radius:7px;padding:.5rem .75rem;font-family:var(--mono);font-size:.82rem;color:var(--text);outline:none;}
+    .mapper-field input:focus{border-color:var(--accent);}
+    .mapper-run-btn{margin:0 1.5rem 1.5rem;padding:.65rem 1.5rem;background:var(--accent);color:white;border:none;border-radius:8px;font-family:var(--sans);font-weight:600;font-size:.85rem;cursor:pointer;}
+    .mapper-result{margin:0 1.5rem 1.5rem;padding:1rem;background:var(--green-lt);border:1.5px solid #a7f3d0;border-radius:8px;font-family:var(--mono);font-size:.83rem;line-height:1.8;}
+    .mapper-result .winner{font-size:1.1rem;font-weight:700;color:var(--green);}
+    .mapper-lang-row{display:flex;justify-content:space-between;align-items:center;padding:.25rem 0;border-bottom:1px solid #a7f3d0;}
+    .mapper-lang-row:last-child{border-bottom:none;}
+    .mapper-lang-row.best{color:var(--green);font-weight:700;}
+
+    /* ── SAMPLES ───────────────────────────────────── */
+    .sample-item{padding:1rem 1.25rem;border-bottom:1px solid var(--border);cursor:pointer;transition:background .15s;}
+    .sample-item:last-child{border-bottom:none;}
+    .sample-item:hover{background:var(--surface2);}
+    .sample-orig{font-size:.85rem;color:var(--text2);margin-bottom:.35rem;}
+    .sample-tok{font-family:var(--mono);font-size:.81rem;color:var(--accent2);margin-bottom:.35rem;}
+    .sample-meta{display:flex;gap:1.5rem;flex-wrap:wrap;font-family:var(--mono);font-size:.72rem;color:var(--text3);}
+    .sample-saved{color:var(--green);font-weight:600;}
+
+    /* ── HOW ────────────────────────────────────────── */
+    .how-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1px;background:var(--border);}
+    .how-cell{background:var(--surface2);padding:1.25rem 1.5rem;}
+    .how-title{font-size:.9rem;font-weight:600;margin-bottom:.5rem;}
+    .how-desc{font-size:.82rem;color:var(--text2);line-height:1.7;}
+
+    /* ── LIVE ───────────────────────────────────────── */
+    .live-row{display:grid;grid-template-columns:1fr 44px 1fr;gap:.75rem;align-items:start;}
+    textarea{background:var(--surface2);border:1.5px solid var(--border);border-radius:8px;padding:.75rem 1rem;color:var(--text);font-family:var(--mono);font-size:.83rem;resize:vertical;min-height:130px;width:100%;outline:none;transition:border-color .15s;}
+    textarea:focus{border-color:var(--accent);}
+    .arrow-btn{align-self:center;background:var(--surface2);border:1.5px solid var(--border);border-radius:8px;width:44px;height:44px;display:flex;align-items:center;justify-content:center;font-size:1rem;cursor:pointer;color:var(--text3);transition:all .15s;}
+    .arrow-btn:hover{border-color:var(--accent);color:var(--accent);}
+    .live-controls{display:flex;gap:.75rem;align-items:center;margin-top:.85rem;flex-wrap:wrap;}
+    select{background:var(--surface2);border:1.5px solid var(--border);border-radius:7px;padding:.5rem .75rem;color:var(--text);font-family:var(--sans);font-size:.83rem;outline:none;cursor:pointer;}
+    .toggle-lbl{display:flex;align-items:center;gap:.45rem;font-size:.83rem;color:var(--text2);cursor:pointer;}
+    input[type=checkbox]{accent-color:var(--accent);}
+    .run-btn{padding:.55rem 1.25rem;background:var(--accent);color:white;border:none;border-radius:7px;font-family:var(--sans);font-weight:600;font-size:.85rem;cursor:pointer;}
+    .live-stats{margin-top:.85rem;padding:.85rem 1rem;background:var(--surface2);border-radius:8px;display:flex;gap:2rem;flex-wrap:wrap;}
+    .lstat{display:flex;flex-direction:column;gap:.15rem;}
+    .lstat-val{font-family:var(--mono);font-size:1rem;font-weight:600;color:var(--accent);}
+    .lstat-label{font-size:.72rem;color:var(--text3);}
+
+    /* ── TABLE ──────────────────────────────────────── */
+    .table{width:100%;border-collapse:collapse;font-size:.83rem;}
+    .table th{text-align:left;padding:.6rem .85rem;color:var(--text3);font-size:.72rem;text-transform:uppercase;letter-spacing:.08em;border-bottom:1px solid var(--border);font-weight:600;}
+    .table td{padding:.6rem .85rem;border-bottom:1px solid var(--bg2);font-family:var(--mono);}
+    .table tr:hover td{background:var(--surface2);}
+    .lpill{display:inline-block;padding:.15rem .45rem;background:var(--surface2);border:1px solid var(--border);border-radius:5px;font-size:.72rem;text-transform:uppercase;}
+    .saved-pill{color:var(--green);font-weight:600;}
+
+    /* ── API KEY ────────────────────────────────────── */
+    .api-box{padding:1.5rem;display:flex;align-items:center;gap:1rem;flex-wrap:wrap;}
+    .api-key-text{font-family:var(--mono);font-size:.82rem;flex:1;word-break:break-all;}
+    .act-btn{padding:.5rem 1rem;background:transparent;border:1.5px solid var(--border);border-radius:7px;font-family:var(--sans);font-size:.8rem;font-weight:600;color:var(--text2);cursor:pointer;transition:all .15s;}
+    .act-btn:hover{border-color:var(--accent);color:var(--accent);}
+    .act-btn.danger:hover{border-color:var(--red);color:var(--red);}
+
+    @keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+    .fade-in{animation:fadeIn .35s ease both;}
+    .lb-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:.75rem;padding:1.25rem;}
+    .lb-card{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:.85rem 1rem;}
+    .lb-lang{font-family:var(--mono);font-size:.72rem;font-weight:600;color:var(--text3);text-transform:uppercase;margin-bottom:.35rem;}
+    .lb-val{font-family:var(--mono);font-size:1.25rem;font-weight:600;color:var(--green);}
+    .lb-sub{font-size:.72rem;color:var(--text3);margin-top:.15rem;}
+  </style>
+</head>
+<body>
+<div class="layout">
+  <aside class="sidebar">
+    <div class="logo">
+      <div class="logo-icon">⚡</div>
+      <div class="logo-text">Token<span>Trans</span></div>
+    </div>
+    <div class="nav-item active" onclick="go('overview')"><span class="ic">📊</span> Overview</div>
+    <div class="nav-item" onclick="go('tokinensis')"><span class="ic">⚡</span> Tokinensis</div>
+    <div class="nav-item" onclick="go('mapper')"><span class="ic">🔬</span> Token Mapper</div>
+    <div class="nav-item" onclick="go('live')"><span class="ic">🌐</span> Live Translate</div>
+    <div class="nav-item" onclick="go('activity')"><span class="ic">📋</span> Activity</div>
+    <div class="nav-item" onclick="go('apikey')"><span class="ic">🔑</span> API Key</div>
+    <div class="sidebar-spacer"></div>
+    <div class="nav-item" onclick="window.location='index.html'" style="margin-bottom:.75rem"><span class="ic">←</span> Home</div>
+    <div class="sidebar-user">
+      <div class="sidebar-user-name" id="sb-name">Loading…</div>
+      <div class="sidebar-user-email" id="sb-email"></div>
+    </div>
+  </aside>
+
+  <main class="main">
+
+    <!-- OVERVIEW -->
+    <div id="sec-overview" class="fade-in">
+      <div class="page-header">
+        <div class="page-title">Overview</div>
+        <div class="badge" id="backend-badge">Loading…</div>
+      </div>
+      <div class="cards-grid">
+        <div class="card"><div class="card-label">Total Requests</div><div class="card-value" id="c-req">—</div><div class="card-sub">translations processed</div></div>
+        <div class="card amber"><div class="card-label">Tokens Original</div><div class="card-value" id="c-orig">—</div><div class="card-sub">before optimization</div></div>
+        <div class="card purple"><div class="card-label">Tokens Optimized</div><div class="card-value" id="c-opt">—</div><div class="card-sub">after optimization</div></div>
+        <div class="card green"><div class="card-label">Tokens Saved</div><div class="card-value" id="c-saved">—</div><div class="card-sub" id="c-pct">0% savings</div></div>
+      </div>
+      <div class="sec-head"><div class="sec-title">Savings by source language</div><div class="sec-line"></div></div>
+      <div class="panel"><div class="lb-grid" id="lang-breakdown"><div class="empty" style="grid-column:1/-1">No translations yet.</div></div></div>
+    </div>
+
+    <!-- TOKINENSIS v1 / v2 -->
+    <div id="sec-tokinensis" style="display:none" class="fade-in">
+      <div class="page-header">
+        <div class="page-title">⚡ Tokinensis</div>
+      </div>
+
+      <!-- VERSION SELECTOR -->
+      <div class="ver-toggle">
+        <button class="ver-btn active" id="ver1-btn" onclick="setVer(1)">
+          <span>Tokinensis v1</span>
+          <span class="ver-tag">Abbreviation + symbols</span>
+        </button>
+        <button class="ver-btn" id="ver2-btn" onclick="setVer(2)">
+          <span>Tokinensis v2</span>
+          <span class="ver-tag">Cross-lingual constructed language</span>
+        </button>
+      </div>
+
+      <!-- v1 description -->
+      <div id="ver1-desc" style="background:var(--accent-lt);border:1px solid #bfdbfe;border-radius:10px;padding:1.1rem 1.25rem;margin-bottom:1.25rem;font-size:.87rem;line-height:1.8;color:var(--text2)">
+        <strong style="color:var(--accent)">Tokinensis v1</strong> replaces expensive English words with shorter BPE-efficient forms: math symbols (∴ ≈ →), tech abbreviations (impl, cfg, infra), and single CJK characters for common concepts. Average savings: <strong style="color:var(--amber)">~28%</strong> vs standard English.
+      </div>
+
+      <!-- v2 description -->
+      <div id="ver2-desc" style="display:none;background:var(--accent2-lt);border:1px solid #c4b5fd;border-radius:10px;padding:1.1rem 1.25rem;margin-bottom:1.25rem;font-size:.87rem;line-height:1.8;color:var(--text2)">
+        <strong style="color:var(--accent2)">Tokinensis v2</strong> is a cross-lingual constructed language with ~160 Latin-ASCII root morphemes (2-4 chars each). Words from EN, ES, ZH, JA, HI all map to the same efficient roots (<em>hom</em>=person, <em>sap</em>=know, <em>vel</em>=want). Articles removed, stop words dropped. Average savings: <strong style="color:var(--accent2)">~35-55%</strong> depending on source language.
+      </div>
+
+      <!-- ENCODER -->
+      <div class="sec-head"><div class="sec-title" id="enc-title">v1 Encoder</div><div class="sec-line"></div></div>
+      <div class="panel">
+        <div class="tok-demo">
+          <div class="tok-input-row">
+            <textarea class="tok-input" id="tok-input" placeholder="Type English, Spanish, Chinese, Japanese, or Hindi text to encode…" rows="4"></textarea>
+            <button class="tok-btn" onclick="encodeTok()">Encode →</button>
+          </div>
+          <div id="tok-result" style="display:none">
+            <div class="tok-cmp">
+              <div class="tok-box">
+                <div class="tok-box-top"><div class="tok-box-label">Original</div><div class="tok-count" id="tok-orig-n">—</div></div>
+                <div class="tok-text" id="tok-orig-text"></div>
+              </div>
+              <div class="tok-box opt">
+                <div class="tok-box-top"><div class="tok-box-label" id="tok-ver-label">⚡ Tokinensis v1</div><div class="tok-count opt" id="tok-opt-n">—</div></div>
+                <div class="tok-text" id="tok-opt-text"></div>
+              </div>
+            </div>
+            <div class="savings-bar-wrap"><div class="savings-bar" id="tok-bar" style="width:0%"></div></div>
+            <div class="savings-row">
+              <div class="sitem">Saved: <strong id="tok-saved-n">0</strong> tokens</div>
+              <div class="sitem">Reduction: <strong id="tok-saved-pct">0%</strong></div>
+              <div class="sitem" id="tok-lang-info" style="color:var(--text3)"></div>
+            </div>
+            <div id="glossary-panel" style="display:none">
+              <div class="glossary-wrap">
+                <div class="glossary-title">Word mappings (v2)</div>
+                <div class="glossary-items" id="glossary-text"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SAMPLES -->
+      <div class="sec-head"><div class="sec-title" id="samples-title">Sample Comparisons — v1</div><div class="sec-line"></div></div>
+      <div class="panel" id="samples-panel"><div class="empty">Loading…</div></div>
+
+      <!-- HOW IT WORKS (v1) -->
+      <div id="how-v1">
+        <div class="sec-head"><div class="sec-title">How v1 works</div><div class="sec-line"></div></div>
+        <div class="panel">
+          <div class="how-grid">
+            <div class="how-cell"><div class="how-title" style="color:var(--accent)">1. Symbols</div><div class="how-desc">∴ = therefore (3→1)<br>≈ = approximately (4→1)<br>→ = implies (2→1)</div></div>
+            <div class="how-cell"><div class="how-title" style="color:var(--accent2)">2. Abbreviations</div><div class="how-desc">impl = implementation (5→1)<br>cfg = configuration (4→1)<br>infra = infrastructure (4→1)</div></div>
+            <div class="how-cell"><div class="how-title" style="color:var(--amber)">3. CJK Glyphs</div><div class="how-desc">好 = good · 全 = all<br>无 = none · 新 = new<br>大 = big · 快 = fast</div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- HOW IT WORKS (v2) -->
+      <div id="how-v2" style="display:none">
+        <div class="sec-head"><div class="sec-title">How v2 works</div><div class="sec-line"></div></div>
+        <div class="panel">
+          <div class="how-grid">
+            <div class="how-cell"><div class="how-title" style="color:var(--accent2)">1. Latin-ASCII Roots</div><div class="how-desc">160 roots, 2-4 chars each.<br>hom = person/humano/人<br>sap = know/saber/知道<br>vel = want/querer/想</div></div>
+            <div class="how-cell"><div class="how-title" style="color:var(--green)">2. Cross-Lingual</div><div class="how-desc">EN, ES, ZH, JA, HI all map to the same roots. A Spanish user and English user produce the same compressed output.</div></div>
+            <div class="how-cell"><div class="how-title" style="color:var(--amber)">3. Operators</div><div class="how-desc">& = and · | = or<br>! = not/no · ? = question<br>~ = approximately<br>:: = is defined as</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TOKEN MAPPER -->
+    <div id="sec-mapper" style="display:none" class="fade-in">
+      <div class="page-header">
+        <div class="page-title">🔬 Cross-Lingual Token Mapper</div>
+        <div class="badge" style="border-color:#a7f3d0;color:var(--green);background:var(--green-lt)">Find cheapest form per concept</div>
+      </div>
+      <div style="background:var(--accent-lt);border:1px solid #bfdbfe;border-radius:10px;padding:1.1rem 1.25rem;margin-bottom:1.5rem;font-size:.87rem;color:var(--text2);line-height:1.8">
+        Enter the same concept expressed in different languages. The mapper will count actual BPE tokens (cl100k_base) for each form and tell you which uses the fewest — this is how Tokinensis v2 determines its root vocabulary.
+      </div>
+
+      <div class="panel">
+        <div style="padding:1.25rem 1.5rem .5rem;font-size:.85rem;font-weight:600;color:var(--text2)">Enter the same concept in different languages:</div>
+        <div class="mapper-grid">
+          <div class="mapper-field"><label>🇬🇧 English</label><input type="text" id="mp-en" placeholder="superhuman"></div>
+          <div class="mapper-field"><label>🇪🇸 Spanish</label><input type="text" id="mp-es" placeholder="superhumano"></div>
+          <div class="mapper-field"><label>🇨🇳 Chinese</label><input type="text" id="mp-zh" placeholder="超人"></div>
+          <div class="mapper-field"><label>🇯🇵 Japanese</label><input type="text" id="mp-ja" placeholder="超人"></div>
+          <div class="mapper-field"><label>🇮🇳 Hindi</label><input type="text" id="mp-hi" placeholder="सुपर मानव"></div>
+          <div class="mapper-field"><label>⚡ Tokinensis v2</label><input type="text" id="mp-tok" placeholder="gra-hom"></div>
+        </div>
+        <button class="mapper-run-btn" onclick="runMapper()">Find Cheapest Form →</button>
+        <div id="mapper-result" style="display:none"></div>
+      </div>
+
+      <!-- Preset examples -->
+      <div class="sec-head"><div class="sec-title">Preset examples</div><div class="sec-line"></div></div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:.75rem">
+        <div class="panel" style="padding:1rem;cursor:pointer" onclick="loadPreset('superhuman')" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='var(--border)'">
+          <div style="font-size:.8rem;font-weight:600;margin-bottom:.35rem">Superhuman</div>
+          <div style="font-family:var(--mono);font-size:.75rem;color:var(--text3)">EN:2 · ES:3 · ZH:2 · tok:2</div>
+        </div>
+        <div class="panel" style="padding:1rem;cursor:pointer" onclick="loadPreset('ai')" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='var(--border)'">
+          <div style="font-size:.8rem;font-weight:600;margin-bottom:.35rem">Artificial Intelligence</div>
+          <div style="font-family:var(--mono);font-size:.75rem;color:var(--text3)">EN:3 · ES:5 · ZH:3 · tok:1</div>
+        </div>
+        <div class="panel" style="padding:1rem;cursor:pointer" onclick="loadPreset('config')" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='var(--border)'">
+          <div style="font-size:.8rem;font-weight:600;margin-bottom:.35rem">Configuration</div>
+          <div style="font-family:var(--mono);font-size:.75rem;color:var(--text3)">EN:4 · ES:5 · ZH:3 · tok:1</div>
+        </div>
+        <div class="panel" style="padding:1rem;cursor:pointer" onclick="loadPreset('implement')" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='var(--border)'">
+          <div style="font-size:.8rem;font-weight:600;margin-bottom:.35rem">Implementation</div>
+          <div style="font-family:var(--mono);font-size:.75rem;color:var(--text3)">EN:5 · ES:5 · ZH:2 · tok:1</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- LIVE TRANSLATE -->
+    <div id="sec-live" style="display:none" class="fade-in">
+      <div class="page-header"><div class="page-title">🌐 Live Translator</div></div>
+      <div class="panel" style="padding:1.5rem">
+        <div class="live-row">
+          <div>
+            <div style="font-size:.75rem;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:.5rem">Your text (any language)</div>
+            <textarea id="live-in" placeholder="Type or paste text in any language…"></textarea>
+          </div>
+          <button class="arrow-btn" onclick="liveTranslate()">→</button>
+          <div>
+            <div style="font-size:.75rem;font-weight:600;color:var(--green);text-transform:uppercase;letter-spacing:.08em;margin-bottom:.5rem">Optimized (sent to LLM)</div>
+            <textarea id="live-out" placeholder="Optimized text appears here…" readonly style="border-color:#a7f3d0;background:var(--green-lt)"></textarea>
+          </div>
+        </div>
+        <div class="live-controls">
+          <select id="live-backend"><option value="">Default backend</option><option value="google">Google Translate</option><option value="local">Local (argostranslate)</option></select>
+          <label class="toggle-lbl"><input type="checkbox" id="live-tok"> Use Tokinensis</label>
+          <select id="live-tokver" style="display:none"><option value="1">v1</option><option value="2">v2</option></select>
+          <button class="run-btn" onclick="liveTranslate()">Translate</button>
+        </div>
+        <div class="live-stats" id="live-stats" style="display:none">
+          <div class="lstat"><div class="lstat-val" id="ls-lang">—</div><div class="lstat-label">Detected lang</div></div>
+          <div class="lstat"><div class="lstat-val" id="ls-orig">—</div><div class="lstat-label">Original tokens</div></div>
+          <div class="lstat"><div class="lstat-val" id="ls-opt">—</div><div class="lstat-label">Optimized tokens</div></div>
+          <div class="lstat"><div class="lstat-val" id="ls-saved" style="color:var(--green)">—</div><div class="lstat-label">Tokens saved</div></div>
+          <div class="lstat"><div class="lstat-val" id="ls-pct" style="color:var(--green)">—</div><div class="lstat-label">% savings</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ACTIVITY -->
+    <div id="sec-activity" style="display:none" class="fade-in">
+      <div class="page-header"><div class="page-title">📋 Recent Activity</div></div>
+      <div class="panel" style="overflow:hidden">
+        <table class="table">
+          <thead><tr><th>Source</th><th>Target</th><th>Orig tokens</th><th>Opt tokens</th><th>Saved</th><th>Backend</th><th>When</th></tr></thead>
+          <tbody id="activity-body"><tr><td colspan="7" class="empty">Loading…</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- API KEY -->
+    <div id="sec-apikey" style="display:none" class="fade-in">
+      <div class="page-header"><div class="page-title">🔑 API Key</div></div>
+      <div class="panel" style="margin-bottom:1rem">
+        <div class="api-box">
+          <div class="api-key-text" id="disp-key">Loading…</div>
+          <button class="act-btn" onclick="cpKey(event)">Copy</button>
+          <button class="act-btn danger" onclick="rotateKey()">Rotate</button>
+        </div>
+      </div>
+      <div class="panel" style="padding:1.5rem">
+        <div style="background:#1e2130;border-radius:10px;overflow:hidden">
+          <div style="padding:.6rem 1rem;background:#2a2d3e;font-family:var(--mono);font-size:.72rem;color:#7882a0">HTTP · Python · skill prompt</div>
+          <pre style="padding:1.25rem;font-family:var(--mono);font-size:.79rem;line-height:1.8;color:#c8d0e8;overflow-x:auto"><span style="color:#5c6080"># HTTP Header</span>
+X-API-Key: <span id="sk1" style="color:#86efac">tk_your_key</span>
+
+<span style="color:#5c6080"># Python (translate_in → LLM → translate_out)</span>
+tt = TokenTranslationClient("https://tokenstree.eu", api_key="<span id="sk2" style="color:#86efac">tk_your_key</span>")
+optimized, meta = await tt.translate_in(user_prompt)
+final = await tt.translate_out(response, meta["source_lang"])
+
+<span style="color:#5c6080"># With Tokinensis v2</span>
+optimized, meta = await tt.translate_in(prompt, use_tokinensis=True, tokinensis_version=2)
+final = await tt.translate_out(resp, meta["source_lang"], was_tokinensis=True, tokinensis_version=2)</pre>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<script>
+const API='/translation';
+let apiKey=localStorage.getItem('tt_api_key')||'';
+let jwt=localStorage.getItem('tt_jwt')||'';
+if(!apiKey&&!jwt){window.location='index.html';}
+
+// Handle OAuth redirect
+const urlP=new URLSearchParams(window.location.search);
+if(urlP.get('token')){localStorage.setItem('tt_jwt',urlP.get('token'));localStorage.setItem('tt_api_key',urlP.get('key')||'');window.history.replaceState({},'','/dashboard.html');}
+
+const H=()=>({'Content-Type':'application/json','X-API-Key':apiKey,...(jwt?{'Authorization':`Bearer ${jwt}`}:{})});
+
+// User
+fetch(`${API}/auth/me`,{headers:H()}).then(r=>r.json()).then(u=>{
+  q('sb-name').textContent=u.username||'—'; q('sb-email').textContent=u.email||'';
+  q('disp-key').textContent=u.api_key; q('sk1').textContent=u.api_key; q('sk2').textContent=u.api_key;
+  if(u.api_key)apiKey=u.api_key;
+}).catch(()=>q('sb-name').textContent='Offline');
+
+// System status
+fetch(`${API}/stats/system`).then(r=>r.json()).then(d=>{
+  const b=q('backend-badge'); b.textContent=d.translation_backend==='google'?'☁ Google Translate':'🖥 Local';
+  b.className=`badge ${d.translation_backend}`;
+}).catch(()=>{});
+
+// Stats
+function loadStats(){
+  fetch(`${API}/stats/me`,{headers:H()}).then(r=>r.json()).then(d=>{
+    const t=d.totals;
+    q('c-req').textContent=fmt(t.requests); q('c-orig').textContent=fmt(t.tokens_original);
+    q('c-opt').textContent=fmt(t.tokens_optimized); q('c-saved').textContent=fmt(t.tokens_saved);
+    q('c-pct').textContent=`${t.savings_percent}% savings`;
+    const lb=q('lang-breakdown');
+    if(d.by_language&&d.by_language.length){
+      lb.innerHTML=d.by_language.map(l=>`<div class="lb-card"><div class="lb-lang">${l.lang.toUpperCase()}</div><div class="lb-val">${fmt(l.tokens_saved)}</div><div class="lb-sub">${l.requests} requests</div></div>`).join('');
+    }
+    const tbody=q('activity-body');
+    if(d.recent_activity&&d.recent_activity.length){
+      tbody.innerHTML=d.recent_activity.map(r=>`<tr><td><span class="lpill">${r.source_lang}</span></td><td><span class="lpill">${r.target_lang}</span></td><td>${r.tokens_original??'—'}</td><td>${r.tokens_optimized??'—'}</td><td class="saved-pill">-${fmt(r.tokens_saved??0)}</td><td style="color:var(--text3)">${r.backend}</td><td style="color:var(--text3)">${timeAgo(r.created_at)}</td></tr>`).join('');
+    }else{tbody.innerHTML='<tr><td colspan="7" class="empty">No translations yet.</td></tr>';}
+  }).catch(()=>{});
+}
+loadStats();
+
+// ── Tokinensis version ────────────────────────────────
+let curVer=1;
+
+function setVer(v){
+  curVer=v;
+  q('ver1-btn').classList.toggle('active',v===1);
+  q('ver2-btn').classList.toggle('active',v===2);
+  q('ver1-desc').style.display=v===1?'block':'none';
+  q('ver2-desc').style.display=v===2?'block':'none';
+  q('tok-ver-label').textContent=v===1?'⚡ Tokinensis v1':'⚡ Tokinensis v2';
+  q('enc-title').textContent=`v${v} Encoder`;
+  q('samples-title').textContent=`Sample Comparisons — v${v}`;
+  q('how-v1').style.display=v===1?'block':'none';
+  q('how-v2').style.display=v===2?'block':'none';
+  // reset result
+  q('tok-result').style.display='none';
+  loadSamples();
+}
+
+async function encodeTok(){
+  const text=q('tok-input').value; if(!text.trim())return;
+  const ep=curVer===2?'/translate/tokinensis/v2/encode':'/translate/tokinensis/encode';
+  try{
+    const r=await fetch(`${API}${ep}`,{method:'POST',headers:H(),body:JSON.stringify({text})});
+    const d=await r.json();
+    q('tok-orig-text').textContent=d.original;
+    q('tok-opt-text').textContent=d.encoded;
+    q('tok-orig-n').textContent=`${d.tokens_original} tokens`;
+    q('tok-opt-n').textContent=`${d.tokens_optimized} tokens`;
+    q('tok-saved-n').textContent=d.tokens_saved;
+    q('tok-saved-pct').textContent=d.savings_pct+'%';
+    q('tok-result').style.display='block';
+    setTimeout(()=>q('tok-bar').style.width=Math.min(100,d.savings_pct*2.5)+'%',100);
+    // Show glossary for v2
+    if(curVer===2&&d.glossary&&d.glossary.length){
+      q('glossary-panel').style.display='block';
+      q('glossary-text').textContent=d.glossary.join(' · ');
+      q('tok-lang-info').textContent=`Detected: ${d.detected_lang||'en'}`;
+    }else{
+      q('glossary-panel').style.display='none';
+      q('tok-lang-info').textContent='';
+    }
+  }catch(e){alert('Backend not reachable.');}
+}
+
+function loadSamples(){
+  const ep=curVer===2?'/translate/tokinensis/v2/samples':'/translate/tokinensis/samples';
+  fetch(`${API}${ep}`,{headers:H()}).then(r=>r.json()).then(samples=>{
+    q('samples-panel').innerHTML=samples.map(s=>`
+      <div class="sample-item" onclick="useS('${(s.original||s.tokinensis||'').replace(/'/g,"\\'")}')">
+        <div class="sample-orig">📝 ${s.original}</div>
+        <div class="sample-tok">⚡ ${s.tokinensis||s.tokinensis_v2||''}</div>
+        <div class="sample-meta">
+          <span>Original: ${s.tokens_original} tokens</span>
+          <span>Tokinensis: ${s.tokens_tokinensis} tokens</span>
+          <span class="sample-saved">-${s.savings} tokens (${s.savings_pct}%)</span>
+          ${s.source_lang?`<span>${s.source_lang.toUpperCase()}</span>`:''}
+        </div>
+      </div>`).join('');
+  }).catch(()=>q('samples-panel').innerHTML='<div class="empty">Connect backend to see samples.</div>');
+}
+
+function useS(text){q('tok-input').value=text;encodeTok();}
+
+// ── Token Mapper ──────────────────────────────────────
+async function runMapper(){
+  const forms={};
+  ['en','es','zh','ja','hi','tok'].forEach(k=>{const v=q(`mp-${k}`).value.trim();if(v)forms[k]=v;});
+  if(!Object.keys(forms).length){alert('Enter at least one form.');return;}
+  const r=await fetch(`${API}/translate/tokinensis/v2/compare-optimal`,{method:'POST',headers:H(),body:JSON.stringify({forms})});
+  const d=await r.json();
+  const resEl=q('mapper-result');
+  resEl.style.display='block';
+  resEl.innerHTML=`
+    <div class="winner">✓ Cheapest: <span style="color:var(--accent)">"${d.optimal_form}"</span> (${d.optimal_lang.toUpperCase()}) — ${d.optimal_tokens} token${d.optimal_tokens!==1?'s':''}</div>
+    <div style="margin-top:.75rem">
+      ${Object.entries(d.forms).map(([lang,info])=>`
+        <div class="mapper-lang-row${lang===d.optimal_lang?' best':''}">
+          <span>${lang.toUpperCase()}: "${info.form}"</span>
+          <span>${info.tokens} token${info.tokens!==1?'s':''}${lang===d.optimal_lang?' ✓':''}</span>
+        </div>`).join('')}
+    </div>`;
+}
+
+const PRESETS={
+  superhuman:{en:'superhuman',es:'superhumano',zh:'超人',ja:'超人',hi:'सुपर मानव',tok:'gra-hom'},
+  ai:{en:'artificial intelligence',es:'inteligencia artificial',zh:'人工智能',ja:'人工知能',hi:'कृत्रिम बुद्धि',tok:'rob'},
+  config:{en:'configuration',es:'configuración',zh:'配置',ja:'設定',hi:'विन्यास',tok:'cfg'},
+  implement:{en:'implementation',es:'implementación',zh:'实施',ja:'実装',hi:'कार्यान्वयन',tok:'impl'},
+};
+function loadPreset(k){const p=PRESETS[k];Object.entries(p).forEach(([l,v])=>{const el=q(`mp-${l}`);if(el)el.value=v;});go('mapper');runMapper();}
+
+// ── Live translate ─────────────────────────────────────
+document.getElementById('live-tok').addEventListener('change',function(){
+  q('live-tokver').style.display=this.checked?'inline-block':'none';
+});
+async function liveTranslate(){
+  const text=q('live-in').value;if(!text.trim())return;
+  const backend=q('live-backend').value||undefined;
+  const tok=q('live-tok').checked;
+  const tokVer=parseInt(q('live-tokver').value||'1');
+  const r=await fetch(`${API}/translate/in`,{method:'POST',headers:H(),body:JSON.stringify({text,use_tokinensis:tok,tokinensis_version:tokVer,backend})});
+  const d=await r.json();
+  q('live-out').value=d.optimized_text;
+  q('live-stats').style.display='flex';
+  q('ls-lang').textContent=d.source_lang.toUpperCase();
+  q('ls-orig').textContent=d.tokens_original;
+  q('ls-opt').textContent=d.tokens_final;
+  q('ls-saved').textContent='-'+d.tokens_saved;
+  q('ls-pct').textContent=d.savings_percent+'%';
+  loadStats();
+}
+
+// ── API Key ──────────────────────────────────────────
+async function rotateKey(){
+  if(!confirm('Rotate API key? Old key stops working immediately.'))return;
+  const r=await fetch(`${API}/auth/rotate-key`,{method:'POST',headers:H()});
+  const d=await r.json();
+  apiKey=d.api_key; localStorage.setItem('tt_api_key',apiKey);
+  q('disp-key').textContent=apiKey; q('sk1').textContent=apiKey; q('sk2').textContent=apiKey;
+}
+function cpKey(e){navigator.clipboard.writeText(apiKey);e.target.textContent='Copied!';setTimeout(()=>e.target.textContent='Copy',1500);}
+
+// ── Navigation ─────────────────────────────────────────
+const SECS=['overview','tokinensis','mapper','live','activity','apikey'];
+function go(name){
+  SECS.forEach(s=>{const el=q(`sec-${s}`);if(el)el.style.display=s===name?'block':'none';});
+  document.querySelectorAll('.nav-item').forEach((el,i)=>el.classList.toggle('active',SECS[i]===name));
+  if(name==='tokinensis')loadSamples();
+}
+
+// Utils
+function q(id){return document.getElementById(id);}
+function fmt(n){if(!n)return'0';if(n>=1e6)return(n/1e6).toFixed(1)+'M';if(n>=1e3)return(n/1e3).toFixed(1)+'K';return String(Math.round(n));}
+function timeAgo(iso){const d=new Date(iso),s=Math.floor((new Date()-d)/1000);if(s<60)return`${s}s ago`;if(s<3600)return`${Math.floor(s/60)}m ago`;if(s<86400)return`${Math.floor(s/3600)}h ago`;return`${Math.floor(s/86400)}d ago`;}
+</script>
+</body>
+</html>
